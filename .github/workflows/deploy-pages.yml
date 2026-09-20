@@ -1,0 +1,49 @@
+name: Publish Leah's birthday card
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'Leah-Interactive-Birthday-Card.zip'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: github-pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Check out the card repository
+        uses: actions/checkout@v4
+      - name: Prepare the exact original card for hosting
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -f Leah-Interactive-Birthday-Card.zip || { echo 'Upload Leah-Interactive-Birthday-Card.zip to the repository root first.'; exit 1; }
+          mkdir -p _site
+          unzip -q Leah-Interactive-Birthday-Card.zip -d _site
+          test -f _site/index.html
+          test -f _site/assets/cover.webp
+          test -f _site/assets/letter.webp
+          test -f _site/assets/heart.webp
+          touch _site/.nojekyll
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+      - name: Upload card site
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+      - name: Publish the public link
+        id: deployment
+        uses: actions/deploy-pages@v4
