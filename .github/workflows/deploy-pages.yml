@@ -39,8 +39,10 @@ jobs:
           test -f _site/assets/letter.webp
           test -f _site/assets/heart.webp
           touch _site/.nojekyll
-      - name: Configure GitHub Pages
+      - name: Configure and enable GitHub Pages
         uses: actions/configure-pages@v5
+        with:
+          enablement: true
       - name: Upload card site
         uses: actions/upload-pages-artifact@v3
         with:
