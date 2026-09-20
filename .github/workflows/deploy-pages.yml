@@ -4,7 +4,7 @@ on:
   push:
     branches: [main]
     paths:
-      - 'Leah-Interactive-Birthday-Card.zip'
+      - 'Leah-Interactive-Birthday-Card*.zip'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
 
@@ -30,9 +30,10 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          test -f Leah-Interactive-Birthday-Card.zip || { echo 'Upload Leah-Interactive-Birthday-Card.zip to the repository root first.'; exit 1; }
+          zip_file='Leah-Interactive-Birthday-Card (2).zip'
+          test -f "$zip_file" || { echo "Missing uploaded birthday card: $zip_file"; exit 1; }
           mkdir -p _site
-          unzip -q Leah-Interactive-Birthday-Card.zip -d _site
+          unzip -q "$zip_file" -d _site
           test -f _site/index.html
           test -f _site/assets/cover.webp
           test -f _site/assets/letter.webp
