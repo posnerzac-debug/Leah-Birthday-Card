@@ -5,8 +5,13 @@ on:
     branches: [main]
     paths:
       - 'Leah-Interactive-Birthday-Card*.zip'
+      - 'birthday-countdown.html'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
+  # Begin shortly before midnight in Toronto; retry after midnight if GitHub is delayed.
+  schedule:
+    - cron: '57 3 24 9 *'
+    - cron: '*/5 4-6 24 9 *'
 
 permissions:
   contents: read
@@ -15,7 +20,7 @@ permissions:
 
 concurrency:
   group: github-pages
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   deploy:
@@ -26,27 +31,43 @@ jobs:
     steps:
       - name: Check out the card repository
         uses: actions/checkout@v4
-      - name: Prepare the exact original card for hosting
+      - name: Prepare countdown before midnight or the untouched card after midnight
         shell: bash
         run: |
           set -euo pipefail
-          zip_file='Leah-Interactive-Birthday-Card (2).zip'
-          test -f "$zip_file" || { echo "Missing uploaded birthday card: $zip_file"; exit 1; }
+          unlock_epoch=$(date -u -d '2026-09-24 04:00:00 UTC' +%s)
+          test -f birthday-countdown.html
+          # An early scheduled run waits until midnight instead of publishing the gift early.
+          if [[ '${{ github.event_name }}' == 'schedule' ]]; then
+            now_epoch=$(date -u +%s)
+            if (( now_epoch < unlock_epoch )); then
+              sleep "$((unlock_epoch - now_epoch))"
+            fi
+          fi
           mkdir -p _site
-          unzip -q "$zip_file" -d _site
-          test -f _site/index.html
-          test -f _site/assets/cover.webp
-          test -f _site/assets/letter.webp
-          test -f _site/assets/heart.webp
+          if (( $(date -u +%s) >= unlock_epoch )); then
+            zip_file='Leah-Interactive-Birthday-Card (2).zip'
+            test -f "$zip_file" || { echo "Missing uploaded birthday card: $zip_file"; exit 1; }
+            unzip -q "$zip_file" -d _site
+            test -f _site/index.html
+            test -f _site/assets/cover.webp
+            test -f _site/assets/letter.webp
+            test -f _site/assets/heart.webp
+            echo 'Birthday has arrived: publishing the original, unchanged card.'
+          else
+            cp birthday-countdown.html _site/index.html
+            test -f _site/index.html
+            echo 'Before birthday: publishing countdown only, without the card images.'
+          fi
           touch _site/.nojekyll
-      - name: Configure and enable GitHub Pages
+      - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
         with:
           enablement: true
-      - name: Upload card site
+      - name: Upload current site
         uses: actions/upload-pages-artifact@v3
         with:
           path: _site
-      - name: Publish the public link
+      - name: Publish at the same public link
         id: deployment
         uses: actions/deploy-pages@v4
