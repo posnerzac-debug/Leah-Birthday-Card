@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f1e6df">
+<meta name="robots" content="noindex,nofollow,noarchive">
+<meta name="birthday-gate" content="2026-09-24T00:00:00-04:00">
+<meta property="og:title" content="A little something for you ♡">
+<meta property="og:description" content="Come back on September 24.">
+<title>A little something for you ♡</title>
+<style>
+:root{color-scheme:light;--ink:#43352e;--rose:#b36568;--muted:#947d75;--border:#d9c7bc}
+*{box-sizing:border-box}
+html{min-height:100%;background:#ede0d8}
+body{margin:0;min-height:100dvh;display:grid;place-items:center;padding:32px 18px;color:var(--ink);font-family:Georgia,'Iowan Old Style',Palatino,serif;background:radial-gradient(ellipse at 16% 10%,#fffaf4 0,transparent 42%),radial-gradient(ellipse at 86% 90%,#e8ceca 0,transparent 46%),#f1e6df}
+main{width:min(100%,640px);text-align:center}
+.brand{font:600 .69rem/1.5 system-ui,sans-serif;letter-spacing:.22em;color:#8f6c63;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:26px}
+.brand span{font:normal 25px/1 Georgia,serif;color:var(--rose);width:36px;height:36px;border-radius:50%;background:#fff9f3;border:1px solid #e4d4c9;display:grid;place-items:center}
+.paper{position:relative;padding:clamp(30px,7vw,56px) clamp(20px,7vw,56px) 37px;background:linear-gradient(145deg,#fffdf9,#fff8f3);border:1px solid #decac0;box-shadow:0 15px 45px #593a2820,0 3px 8px #593a280e;transform:rotate(-.65deg)}
+.paper:before{content:"";position:absolute;inset:12px;border:1px solid #e9dad2;pointer-events:none}
+.seal{position:relative;margin:0 auto 24px;width:60px;height:60px;border-radius:50%;border:1px solid #e1c7c0;display:grid;place-items:center;color:#bb797a;background:#f9eae5;font-size:26px;box-shadow:0 2px 6px #4b25160c}
+.eyebrow{position:relative;margin:0 0 12px;color:#aa7470;font:600 .67rem/1.5 system-ui,sans-serif;letter-spacing:.17em;text-transform:uppercase}
+h1{position:relative;margin:0 auto 15px;max-width:510px;font-weight:normal;font-size:clamp(2.1rem,6vw,3.4rem);line-height:1.08;letter-spacing:-.045em}
+.message{position:relative;margin:0 auto;color:#785f56;max-width:440px;font-size:clamp(1.05rem,3.7vw,1.35rem);line-height:1.6}
+.rule{width:54px;height:1px;background:#d9bcb3;margin:32px auto 25px}
+.unlock-label{font:600 .67rem/1.7 system-ui,sans-serif;color:#94736a;letter-spacing:.14em;text-transform:uppercase;margin:0 0 16px}
+.countdown{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;position:relative}
+.unit{padding:17px 4px 14px;border-radius:5px;background:#f6ece6;border:1px solid #e9d8cf;min-width:0}
+.value{display:block;color:#674b43;font:normal clamp(1.7rem,6vw,2.6rem)/1.2 Georgia,serif;font-variant-numeric:tabular-nums}
+.label{display:block;color:#a28479;font:600 .57rem/1.7 system-ui,sans-serif;letter-spacing:.14em;text-transform:uppercase;margin-top:6px}
+.status{color:#8c736b;font-size:.91rem;line-height:1.6;min-height:1.6em;margin:22px auto 0}
+.signature{font-style:italic;color:#ab8280;font-size:1rem;margin:30px 0 0}
+footer{font:500 .7rem/1.7 system-ui,sans-serif;color:#a0877c;letter-spacing:.04em;margin-top:25px}
+@media(max-width:400px){.paper{padding:29px 16px}.paper:before{inset:7px}.countdown{gap:5px}.unit{padding:12px 2px}.label{font-size:.51rem;letter-spacing:.06em}.brand{letter-spacing:.11em}}
+@media(prefers-reduced-motion:reduce){.paper{transform:none}}
+</style>
+</head>
+<body>
+<main>
+  <div class="brand"><span aria-hidden="true">♡</span> A LITTLE SOMETHING FOR YOU</div>
+  <section class="paper" aria-label="Birthday card countdown">
+    <div class="seal" aria-hidden="true">♡</div>
+    <p class="eyebrow">A birthday surprise</p>
+    <h1>Nuh-uh-uh.</h1>
+    <p class="message">Come back when you're a bit older and wiser.</p>
+    <div class="rule" aria-hidden="true"></div>
+    <p class="unlock-label">Unlocks September 24 · 12:00 a.m. Toronto time</p>
+    <div class="countdown" role="timer" aria-label="Time until September 24 at midnight Toronto time">
+      <div class="unit"><span class="value" id="days">00</span><span class="label">Days</span></div>
+      <div class="unit"><span class="value" id="hours">00</span><span class="label">Hours</span></div>
+      <div class="unit"><span class="value" id="minutes">00</span><span class="label">Minutes</span></div>
+      <div class="unit"><span class="value" id="seconds">00</span><span class="label">Seconds</span></div>
+    </div>
+    <p class="status" id="status" aria-live="polite">A little patience makes the surprise sweeter. ♡</p>
+    <p class="signature">From Zac.</p>
+  </section>
+  <footer>This page will open the card automatically when it is published.</footer>
+</main>
+<script>
+'use strict';
+const unlockAt = Date.parse('2026-09-24T00:00:00-04:00');
+const ids = ['days', 'hours', 'minutes', 'seconds'];
+const displays = ids.map(id => document.getElementById(id));
+const status = document.getElementById('status');
+let checking = false;
+let opened = false;
+let refreshTimer = null;
+function tick(){
+  const remaining = Math.max(0, Math.ceil((unlockAt - Date.now()) / 1000));
+  const values = [Math.floor(remaining/86400), Math.floor(remaining/3600)%24, Math.floor(remaining/60)%60, remaining%60];
+  values.forEach((value,i) => { displays[i].textContent=String(value).padStart(2,'0'); });
+  if(remaining===0 && !refreshTimer){
+    status.textContent='It’s your birthday! Your surprise is opening… ♡';
+    checkRelease();
+    refreshTimer=setInterval(checkRelease,5000);
+  }
+}
+async function checkRelease(){
+  if(checking || opened)return;
+  checking=true;
+  try{
+    const url=new URL(window.location.href);
+    url.searchParams.set('birthday_check',String(Date.now()));
+    const response=await fetch(url.href,{cache:'no-store'});
+    if(!response.ok)throw Error('Card not ready');
+    const html=await response.text();
+    if(!html.includes('name="birthday-gate"')){
+      opened=true;
+      clearInterval(refreshTimer);
+      status.textContent='The card is ready. Opening now… ♡';
+      const destination=new URL(window.location.href);
+      destination.searchParams.delete('birthday_check');
+      destination.searchParams.set('birthday_open',String(Date.now()));
+      window.location.replace(destination.href);
+    }else{
+      status.textContent='It’s your birthday! Just getting your surprise ready… ♡';
+    }
+  }catch(_){
+    status.textContent='It’s your birthday! Checking for your surprise… ♡';
+  }finally{checking=false;}
+}
+tick();
+setInterval(tick,250);
+</script>
+</body>
+</html>
