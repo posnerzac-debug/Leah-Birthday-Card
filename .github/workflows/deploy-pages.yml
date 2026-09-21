@@ -6,6 +6,8 @@ on:
     paths:
       - 'Leah-Interactive-Birthday-Card*.zip'
       - 'birthday-countdown.html'
+      - 'birthday-preview.py'
+      - 'birthday-social-meta.py'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
   # Begin shortly before midnight in Toronto; retry after midnight if GitHub is delayed.
@@ -53,13 +55,29 @@ jobs:
             test -f _site/assets/cover.webp
             test -f _site/assets/letter.webp
             test -f _site/assets/heart.webp
-            echo 'Birthday has arrived: publishing the original, unchanged card.'
+            echo 'Birthday has arrived: publishing the original card.'
           else
             cp birthday-countdown.html _site/index.html
             test -f _site/index.html
             echo 'Before birthday: publishing countdown only, without the card images.'
           fi
           touch _site/.nojekyll
+      - name: Prepare image-generation Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Set non-spoiler link preview without changing the card itself
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --quiet Pillow
+          python birthday-preview.py _site/birthday-preview.png
+          python birthday-social-meta.py _site/index.html
+          test -s _site/birthday-preview.png
+          grep -q 'property="og:image" content="https://posnerzac-debug.github.io/Leah-Birthday-Card/birthday-preview.png' _site/index.html
+          if [[ '${{ github.event_name }}' != 'schedule' ]] && (( $(date -u +%s) < $(date -u -d '2026-09-24 04:00:00 UTC' +%s) )); then
+            test ! -d _site/assets || { echo 'Gift assets must not be published early.'; exit 1; }
+          fi
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
         with:
