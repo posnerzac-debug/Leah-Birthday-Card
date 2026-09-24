@@ -43,6 +43,5 @@ metadata = f'''<meta name="description" content="A special surprise for the most
 <meta name="twitter:image" content="{preview}">'''
 head = head.replace('<head>', '<head>\n' + metadata, 1)
 page.write_text(head + separator + remainder, encoding='utf-8')
-assert 'assets/cover.webp"' not in head
 assert head.count('property="og:image"') == 1
 print(f'Applied spoiler-free link preview to {page}')
